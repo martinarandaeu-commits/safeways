@@ -1,0 +1,54 @@
+:root {
+    --bg: #0b0d0f;
+    --side: #16181b;
+    --accent: #00a89e;
+    --border: #2d3136;
+}
+
+body, html { margin: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; overflow: hidden; }
+.app-container { display: flex; height: 100vh; }
+
+.sidebar { width: 340px; background: var(--side); padding: 20px; z-index: 2000; box-shadow: 5px 0 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+.header h1 { color: var(--accent); margin: 0; font-size: 22px; letter-spacing: 1px; }
+.header span { font-size: 10px; color: #666; font-weight: bold; }
+
+.field { margin-top: 25px; position: relative; }
+label { font-size: 10px; font-weight: bold; color: var(--accent); display: block; margin-bottom: 5px; opacity: 0.8; }
+
+input {
+    width: 100%; padding: 12px; background: #23262b; border: 1px solid var(--border);
+    color: white; border-radius: 4px; box-sizing: border-box; outline: none; transition: 0.3s;
+}
+input:focus { border-color: var(--accent); background: #2a2e34; }
+
+.search-box { position: relative; }
+
+.results-container {
+    position: absolute;
+    top: 48px; left: 0; right: 0;
+    background: #1c1f24;
+    border: 1px solid var(--accent);
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    z-index: 9999;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+}
+
+.result-item {
+    padding: 12px; border-bottom: 1px solid #2d3136;
+    cursor: pointer; font-size: 13px; line-height: 1.4;
+}
+.result-item:hover { background: var(--accent); color: black; }
+
+#calc-btn {
+    width: 100%; margin-top: 25px; padding: 15px;
+    background: var(--accent); color: black; border: none;
+    font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.3s;
+}
+#calc-btn:hover { background: #00d1c5; transform: translateY(-2px); }
+
+.info-box { margin-top: auto; padding: 15px; background: #0b0d0f; border-left: 3px solid var(--accent); font-size: 13px; margin-bottom: 10px; }
+#map { flex-grow: 1; z-index: 1; }
+#gps-info { font-size: 10px; color: #888; }

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SafeWays - Chile Smart Route</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="header">
+        <h1>SafeWays</h1>
+        <span>SISTEMA DE GESTIÓN DE RIESGO</span>
+      </div>
+
+      <div class="panel">
+        <div class="field">
+          <label>PUNTO DE PARTIDA</label>
+          <input type="text" id="origin-input" value="Buscando tu ubicación..." readonly />
+          <small id="gps-info">Iniciando GPS...</small>
+        </div>
+
+        <div class="field">
+          <label>DESTINO (CHILE)</label>
+          <div class="search-box">
+            <input
+              type="text"
+              id="dest-input"
+              placeholder="Ej: Costanera Center, Santiago"
+              autocomplete="off"
+            />
+            <div id="results-list" class="results-container"></div>
+          </div>
+        </div>
+
+        <button id="calc-btn">TRAZAR RUTA SEGURA</button>
+      </div>
+
+      <div id="route-panel" class="info-box">
+        Selecciona un destino para analizar la ruta.
+      </div>
+    </aside>
+
+    <div id="map"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
