@@ -1,4 +1,4 @@
-const API_URL = 'https://rutasegura-t7a5.onrender.com';
+const API_URL = 'https://rutasegura-t7a5.onrender.com/api';
 
 /* ===============================
    MAPA
