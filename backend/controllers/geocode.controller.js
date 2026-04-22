@@ -13,18 +13,11 @@ const searchPlaces = async (req, res) => {
     const results = await searchInNominatim(q);
     res.json(results);
   } catch (error) {
-  console.error('Error en geocodificación:');
-  console.error('Mensaje:', error.message);
-
-  if (error.response) {
-    console.error('Status:', error.response.status);
-    console.error('Data:', error.response.data);
+    console.error('Error en geocodificación:', error.message);
+    res.status(500).json({
+      error: 'Error al buscar ubicaciones.'
+    });
   }
-
-  res.status(500).json({
-    error: 'Error al buscar ubicaciones.'
-  });
-}
 };
 
 module.exports = { searchPlaces };

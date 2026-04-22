@@ -14,6 +14,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/geocode', require('./routes/geocode.routes'));
 app.use('/api/route', require('./routes/route.routes'));
+app.use('/api/risk-map', require('./routes/risk-map.routes'));
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);

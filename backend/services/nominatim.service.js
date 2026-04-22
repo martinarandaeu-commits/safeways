@@ -11,7 +11,8 @@ const searchInNominatim = async (query) => {
     },
     headers: {
       'User-Agent': 'SafeWays/1.0 (Proyecto academico)'
-    }
+    },
+    timeout: 10000
   });
 
   return response.data;

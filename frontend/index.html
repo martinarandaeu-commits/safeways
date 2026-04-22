@@ -1,53 +1,227 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-CL">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SafeWays - Chile Smart Route</title>
+  <meta name="description" content="SafeWays: planificador de rutas con alternativas y seguimiento por GPS." />
+  <meta name="theme-color" content="#00a89e" />
+  <title>SafeWays</title>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app-container">
-    <aside class="sidebar">
-      <div class="header">
-        <h1>SafeWays</h1>
-        <span>SISTEMA DE GESTIÓN DE RIESGO</span>
-      </div>
+  <div class="app-shell">
+    <div id="map" role="application" aria-label="Mapa de rutas SafeWays"></div>
 
-      <div class="panel">
-        <div class="field">
-          <label>PUNTO DE PARTIDA</label>
-          <input type="text" id="origin-input" value="Buscando tu ubicación..." readonly />
-          <small id="gps-info">Iniciando GPS...</small>
-        </div>
+    <aside class="planner-panel" id="plannerPanel" aria-label="Panel de planificacion de rutas">
+      <div class="planner-header">
+        <button
+          class="header-menu-icon"
+          id="menuBtn"
+          type="button"
+          aria-label="Alternar panel"
+          aria-controls="plannerPanel"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
 
-        <div class="field">
-          <label>DESTINO (CHILE)</label>
-          <div class="search-box">
-            <input
-              type="text"
-              id="dest-input"
-              placeholder="Ej: Costanera Center, Santiago"
-              autocomplete="off"
-            />
-            <div id="results-list" class="results-container"></div>
+        <div class="brand-lockup">
+          <div class="planner-title">
+            <h1>Indicaciones para llegar</h1>
           </div>
         </div>
 
-        <button id="calc-btn">TRAZAR RUTA SEGURA</button>
+        <button
+          class="settings-icon-btn"
+          id="settingsBtn"
+          type="button"
+          aria-label="Cambiar a modo oscuro"
+          aria-pressed="false"
+          title="Cambiar tema"
+        >
+          <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2" />
+            <path d="M12 20v2" />
+            <path d="M4.93 4.93l1.41 1.41" />
+            <path d="M17.66 17.66l1.41 1.41" />
+            <path d="M2 12h2" />
+            <path d="M20 12h2" />
+            <path d="M4.93 19.07l1.41-1.41" />
+            <path d="M17.66 6.34l1.41-1.41" />
+          </svg>
+        </button>
       </div>
 
-      <div id="route-panel" class="info-box">
-        Selecciona un destino para analizar la ruta.
+      <div class="planner-body">
+        <div class="location-card">
+          <div class="directions-grid">
+            <div class="route-icons" aria-hidden="true">
+              <div class="route-dot route-dot--origin"></div>
+              <div class="route-dash"></div>
+              <div class="route-dot route-dot--destination">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M12 21s7-5.2 7-11a7 7 0 0 0-14 0c0 5.8 7 11 7 11z" />
+                  <circle cx="12" cy="10" r="2.2" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="fields-stack">
+              <div class="search-box location-field">
+                <label class="sr-only" for="origin-input">Punto de salida</label>
+                <input
+                  type="text"
+                  id="origin-input"
+                  placeholder="Selecciona el punto de salida"
+                  autocomplete="off"
+                  aria-autocomplete="list"
+                  aria-controls="origin-results"
+                  aria-expanded="false"
+                />
+                <span class="field-search-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <circle cx="11" cy="11" r="6" />
+                    <path d="M16 16l4 4" />
+                  </svg>
+                </span>
+                <div id="origin-results" class="results-container" role="listbox" aria-label="Resultados de origen"></div>
+              </div>
+
+              <div class="search-box location-field">
+                <label class="sr-only" for="dest-input">Destino</label>
+                <input
+                  type="text"
+                  id="dest-input"
+                  placeholder="Selecciona el destino"
+                  autocomplete="off"
+                  aria-autocomplete="list"
+                  aria-controls="dest-results"
+                  aria-expanded="false"
+                />
+                <span class="field-search-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <circle cx="11" cy="11" r="6" />
+                    <path d="M16 16l4 4" />
+                  </svg>
+                </span>
+                <div id="dest-results" class="results-container" role="listbox" aria-label="Resultados de destino"></div>
+              </div>
+            </div>
+
+            <button
+              id="swap-btn"
+              class="swap-icon-btn"
+              type="button"
+              aria-label="Intercambiar origen y destino"
+              title="Intercambiar origen y destino"
+            >
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M7 7h10" />
+                <path d="M13 3l4 4-4 4" />
+                <path d="M17 17H7" />
+                <path d="M11 13l-4 4 4 4" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="departure-row" id="departureSelector">
+            <button
+              class="departure-time"
+              id="departureToggle"
+              type="button"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l4 2" />
+              </svg>
+              <span id="departureLabel">Salir ahora</span>
+              <span class="caret" aria-hidden="true"></span>
+            </button>
+
+            <div class="departure-menu" id="departureMenu" role="menu">
+              <button class="departure-option is-active" type="button" data-mode="now" role="menuitem">
+                Salir ahora
+              </button>
+              <button class="departure-option" type="button" data-mode="arrive" role="menuitem">
+                Llegar a las
+              </button>
+            </div>
+
+            <div class="arrival-controls" id="arrivalControls">
+              <label class="arrival-select">
+                <span class="sr-only">Fecha de llegada</span>
+                <select id="arrivalDateSelect" aria-label="Fecha de llegada"></select>
+              </label>
+              <label class="arrival-select">
+                <span class="sr-only">Hora de llegada</span>
+                <select id="arrivalTimeSelect" aria-label="Hora de llegada"></select>
+              </label>
+            </div>
+          </div>
+
+          <div class="planner-row">
+            <button id="calc-btn" class="primary-btn" type="button">
+              Ver rutas
+            </button>
+            <button id="start-nav-btn" class="secondary-btn" type="button" disabled>
+              Iniciar
+            </button>
+          </div>
+
+          <div class="status-row">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="gps-info" aria-live="polite">Ubicaci&oacute;n no definida</span>
+          </div>
+        </div>
+
+        <div class="summary-strip" id="summaryStrip" aria-label="Resumen de la ruta seleccionada">
+          <div class="summary-chip">
+            <span>Tiempo</span>
+            <strong id="summary-time">--</strong>
+          </div>
+          <div class="summary-chip">
+            <span>Distancia</span>
+            <strong id="summary-distance">--</strong>
+          </div>
+          <div class="summary-chip">
+            <span>Riesgo</span>
+            <strong id="summary-risk">--</strong>
+          </div>
+        </div>
+
+        <div class="routes-panel" id="routesPanel" aria-label="Alternativas de ruta">
+          <div class="routes-list" id="routes-list">
+            <div class="empty-routes">
+              Elige origen y destino.
+            </div>
+          </div>
+        </div>
       </div>
     </aside>
 
-    <div id="map"></div>
+    <button id="follow-btn" class="follow-btn" type="button">
+      Seguir
+    </button>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="script.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js" defer></script>
+  <script src="script.js" defer></script>
 </body>
 </html>

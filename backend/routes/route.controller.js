@@ -1,12 +1,5 @@
 const { fetchRouteFromOSRM } = require('../services/osrm.service');
-const { calculateRoutesRisk } = require('../services/risk.service');
-
-const EMPTY_RISK = {
-  riesgo_total: 0,
-  riesgo_por_km: 0,
-  puntos_cercanos: 0
-};
-const RESPONSE_ROUTE_COUNT = 3;
+const { calculateRouteRisk } = require('../services/risk.service');
 
 const getBaseRoute = async (req, res) => {
   try {
@@ -22,6 +15,12 @@ const getBaseRoute = async (req, res) => {
     res.json(route);
   } catch (error) {
     console.error('Error al obtener ruta base:', error.message);
+
+    if (error.response) {
+      console.error('Status:', error.response.status);
+      console.error('Data:', error.response.data);
+    }
+
     res.status(500).json({
       error: 'No se pudo obtener la ruta.'
     });
@@ -46,55 +45,31 @@ const getSafeRoute = async (req, res) => {
       });
     }
 
-    let risks = [];
-
-    try {
-      risks = await calculateRoutesRisk(osrmData.routes);
-    } catch (riskError) {
-      console.error('No se pudo calcular riesgo para rutas:', riskError.message);
-      risks = osrmData.routes.map(() => EMPTY_RISK);
-    }
-
     const evaluatedRoutes = [];
 
     for (let i = 0; i < osrmData.routes.length; i++) {
       const route = osrmData.routes[i];
-      const riskData = risks[i] || EMPTY_RISK;
+      const coords = route.geometry.coordinates;
+
+      const riskData = await calculateRouteRisk(coords, route.distance);
 
       evaluatedRoutes.push({
         index: i,
         geometry: route.geometry,
         distance: route.distance,
         duration: route.duration,
-        legs: route.legs || [],
         risk_total: riskData.riesgo_total,
         risk_per_km: riskData.riesgo_por_km,
         critical_points: riskData.puntos_cercanos
       });
     }
 
-    evaluatedRoutes.sort((a, b) => {
-      if (a.risk_total !== b.risk_total) {
-        return a.risk_total - b.risk_total;
-      }
-
-      if (a.critical_points !== b.critical_points) {
-        return a.critical_points - b.critical_points;
-      }
-
-      if (a.risk_per_km !== b.risk_per_km) {
-        return a.risk_per_km - b.risk_per_km;
-      }
-
-      return a.distance - b.distance;
-    });
-
-    const safestRoutes = evaluatedRoutes.slice(0, RESPONSE_ROUTE_COUNT);
+    evaluatedRoutes.sort((a, b) => a.risk_per_km - b.risk_per_km);
 
     res.json({
       code: 'Ok',
-      best_route_index: safestRoutes[0].index,
-      routes: safestRoutes
+      best_route_index: evaluatedRoutes[0].index,
+      routes: evaluatedRoutes
     });
   } catch (error) {
     console.error('Error al obtener ruta segura:', error.message);
